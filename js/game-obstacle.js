@@ -1,36 +1,48 @@
-game.obstacles = {};
+game.obstacle = {};
 
 ( function( $ ) {
 	"use strict";
 
-	game.obstacles.obstacle = [];
-
-	game.obstacles.init = function() {
-		game.obstacles.character = '&#9776;';
-
-		game.obstacles.add( 3, 3 );
-		game.obstacles.add( 3, 8 );
-		game.obstacles.add( 5, 3 );
-		game.obstacles.add( 7, 6 );
-		game.obstacles.add( 6, 9 );
-		game.obstacles.add( 5, 6 );
+	gameObstacle.prototype = new gameObject();
+	gameObstacle.prototype.constructor = gameObstacle;
+	function gameObstacle() {
+		this.type = 'obstacle';
+		this.character = '&#9776;';
 	};
 
-	game.obstacles.get = function( id ) {
-		var el = id.split('-');
-		return game.obstacles.obstacle[ el[1] ];
+	gameObstacle.prototype.canMove = function( type ) {
+		switch ( type ) {
+			case 'player':
+			case 'obstacle':
+				return true;
+			break;
+			default:
+				return false;
+		}// end switch
 	};
 
-	game.obstacles.add = function( x, y ) {
-		game.obstacles.obstacle.push( {} );
-		var i = game.obstacles.obstacle.length - 1;
+	game.obstacle.obstacles = [];
 
-		game.obstacles.obstacle[i].character = game.obstacles.character;
-		game.obstacles.obstacle[i].id = 'obstacle-' + i;
-		game.obstacles.obstacle[i].type = 'obstacle';
+	game.obstacle.init = function() {
+		game.obstacle.add( 3, 3 );
+		game.obstacle.add( 3, 8 );
+		game.obstacle.add( 5, 3 );
 
-		game.position( game.obstacles.obstacle[i], x, y );
+		game.obstacle.add( 7, 7 );
+		game.obstacle.add( 6, 5 );
+		game.obstacle.add( 5, 6 );
+		game.obstacle.add( 5, 5 );
+	};
+
+	game.obstacle.add = function( x, y ) {
+		var obstacle = new gameObstacle();
+
+		var i = game.obstacle.obstacles.length;
+		obstacle.id = 'obstacle-' + i;
+
+		game.obstacle.obstacles.push( obstacle );
+		game.position( obstacle, x, y );
 	};
 })(jQuery);
 
-amplify.subscribe( 'game-init', game.obstacles.init );
+amplify.subscribe( 'game-init', game.obstacle.init );

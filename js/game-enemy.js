@@ -3,90 +3,119 @@ game.enemy = {};
 ( function( $ ) {
 	"use strict";
 
-	game.enemy.init = function() {
-		game.enemy.character = '&#9763;';
-		game.enemy.speed = 500;
-		game.enemy.id = 'enemy';
-
-		game.position( game.enemy, 9, 9 );
-
-		amplify.subscribe( 'game-move', game.enemy.check_move );
-
-		game.enemy.go();
+	gameEnemy.prototype = new gameObject();
+	gameEnemy.prototype.constructor = gameEnemy;
+	function gameEnemy() {
+		this.type = 'enemy';
+		this.character = '&#9763;';
 	};
 
-	game.enemy.go = function() {
-		game.enemy.timer = setInterval(function(){
-			game.enemy.move();
-		}, game.enemy.speed);
+	gameEnemy.prototype.canKill = function( type ) {
+		switch ( type ) {
+			case 'player':
+				return true;
+			break;
+			default:
+				return false;
+		}// end switch
 	};
 
-	game.enemy.stop = function() {
-		clearInterval( game.enemy.timer );
+	gameEnemy.prototype.go = function() {
+		// @TODO: address IE bug (parameter passign not allowed)
+		this.timer = setInterval( this.move, game.enemy.speed, this );
 	};
 
-	game.enemy.move = function() {
+	gameEnemy.prototype.stop = function() {
+		clearInterval( this.timer );
+	};
+
+	// Note: we cannot use "this" in this function because setInterval sets it incorrectly
+	gameEnemy.prototype.move = function( who ) {
 		var directions = [];
 
 		// @TODO - enemy is *really* dumb about finding it's way around obstacles
 
-		var all_directions = false;
-
-		if ( false === game.enemy.moved ) {
+		if ( false === who.moved ) {
 			directions = game.directions.slice(0);
-			directions.sort(function() {return 0.5 - Math.random()});
-
-			/*
-			// let's speed the enemy up a bit if they run into an obstacle
-			game.enemy.stop();
-			game.enemy.speed -= 10;
-			game.enemy.go();
-			*/
+			directions.sort( function() { return 0.5 - Math.random() } );
 
 			for ( var i = 0; i < directions.length; i++ ) {
-				game.enemy.move_direction = directions[ i ];
-				game.enemy.moved = game.move( game.enemy, game.enemy.move_direction );
+				who.moved = game.move( who, directions[ i ] );
 
-				if ( true === game.enemy.moved ) {
-					return game.enemy.moved;
-				}
+				if ( true === who.moved ) {
+					return who.moved;
+				}// end if
 			}// end for
-			game.over( true );
+
+			// @TODO make this handle multiple enemies
+			if ( 'active' == game.state ) {
+				game.over( true, who ); // win!
+			}// end if
 		} else {
-			if ( game.enemy.y > game.player.y ) {
+			if ( who.y > game.the_player.y ) {
 				directions.push('up');
 			}// end if
 
-			if ( game.enemy.y < game.player.y ) {
+			if ( who.y < game.the_player.y ) {
 				directions.push('down');
 			}// end if
 
-			if ( game.enemy.x < game.player.x ) {
+			if ( who.x < game.the_player.x ) {
 				directions.push('right');
 			}// end if
 
-			if ( game.enemy.x > game.player.x ) {
+			if ( who.x > game.the_player.x ) {
 				directions.push('left');
 			}// end if
 
-			// succeeded in this direction last time and its still a valid direction, increase the odds
-			if ( true === game.enemy.moved && -1 !== directions.indexOf( game.enemy.move_direction ) ) {
-				directions.push( game.enemy.move_direction );
+			// succeeded in who direction last time and its still a valid direction, increase the odds
+			if ( true === who.moved && -1 !== directions.indexOf( who.move_direction ) ) {
+				directions.push( who.move_direction );
 			}// end if
 
-			game.enemy.move_direction = directions[ Math.floor( Math.random() * directions.length ) ];
-			game.enemy.moved = game.move( game.enemy, game.enemy.move_direction );
+			who.move_direction = directions[ Math.floor( Math.random() * directions.length ) ];
+			who.moved = game.move( who, who.move_direction );
 		}// end else
 
-		return game.enemy.moved;
+		return who.moved;
 	};
 
-	game.enemy.check_move = function( data ) {
-		if ( 'player' === data.type && data.x === game.enemy.x && data.y === game.enemy.y ) {
-			game.position( game.player, data.x, data.y );
-			game.over(0);
+	gameEnemy.prototype.kill = function( who ) {
+		if ( 'player' === who.type ) {
+			game.position( who, this.x, this.y );
+			game.over( 0, this );
 		}// end if
 	};
+
+	/**
+	 * Setup enemies
+	 */
+
+	game.enemy.init = function() {
+		game.enemy.speed = 400;
+		game.enemy.enemies = [];
+
+		game.enemy.add( 9, 9 );
+	};
+
+	game.enemy.add = function( x, y ) {
+		var enemy = new gameEnemy();
+
+		var i = game.enemy.enemies.length;
+
+		enemy.id = 'enemy-' + i;
+
+		game.enemy.enemies.push( enemy );
+		game.position( enemy, x, y );
+
+		enemy.go();
+	};
+
+	game.enemy.stop = function() {
+		for ( var i = 0; i < game.enemy.enemies.length; i++ ) {
+			game.enemy.enemies[i].stop();
+		}// end for
+	}
 })(jQuery);
 
 amplify.subscribe( 'game-init', game.enemy.init );

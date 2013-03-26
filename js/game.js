@@ -18,14 +18,16 @@ var game = {};
 
 	game.resetBoard = function () {
 		$('#win').remove();
-
 		game.state = 'active';
+		game.drawBoard();
+	};
 
+	game.drawBoard = function() {
 		var board='';
 		for ( var i = 1; i <= game.grid_size; i++ ) {
-			board += '<div class="row' + i + '">';
+			board += '<div class="row">';
 			for ( var j = 1; j <= game.grid_size; j++) {
-				board += '<div class="cell col' + j + '">&nbsp;</div>';
+				board += '<div class="cell" id="c' + j + 'r' + i + '"></div>';
 			}// end for
 			board += '</div>';
 		}// end for
@@ -33,36 +35,37 @@ var game = {};
 		$('#board').html( board );
 	};
 
+	game.getSelector = function( x, y ) {
+		return '#c' + x + 'r' + y
+	};
+
+	game.getPosition = function( who ) {
+		return game.getSelector( who.x, who.y );
+	};
+
+	game.getObjectByPosition = function( x, y ) {
+		var position = game.getSelector( x, y );
+		return game.occupied[ position ];
+	};
+
 	game.position = function( who, x, y ) {
 
-		var prior_position = '.row' + who.y + ' .col' + who.x;
+		var prior_position = game.getSelector( who.x, who.y );
 
-		if ( x ) {
-			who.x = x;
-		}// end if
+		who.x = x;
+		who.y = y;
 
-		if ( y ) {
-			who.y = y;
-		}// end if
+		var new_position = game.getSelector( who.x, who.y );
 
-		var new_position = '.row' + who.y + ' .col' + who.x;
+		$( new_position ).html( who.character );
+		game.occupied[ new_position ] = who;
 
-		if ( new_position !== prior_position ) {
-			$( new_position ).html( who.character );
-			game.occupied[ new_position ] = who;
-
-			if ( game.occupied[ prior_position ] === who ) {
-				$( prior_position ).html('');
-				game.occupied[ prior_position ] = null;
-			}// end if
+		if ( game.occupied[ prior_position ] === who ) {
+			$( prior_position ).html('');
+			game.occupied[ prior_position ] = null;
 		}// end if
 
 		return new_position;
-	};
-
-	game.get_position = function( x, y ) {
-		var position = '.row' + y + ' .col' + x;
-		return game.occupied[ position ];
 	};
 
 	game.move = function( who, direction ) {
@@ -106,19 +109,22 @@ var game = {};
 		}// end switch
 
 		var prior_moved = true;
-		prior_who = game.get_position( new_x, new_y );
+		prior_who = game.getObjectByPosition( new_x, new_y );
 
 		if ( undefined !== prior_who && null !== prior_who) {
-			// a player or obstacle can push an obstacle, but nothing else can
-			if ( ('player' === who.type || 'obstacle' === who.type ) && 'obstacle' === prior_who.type ) {
-				prior_moved = game.move( prior_who, direction );
-				console.log('moved:'+prior_moved);
-			} else if ( ( 'enemy' === who.type && 'player' === prior_who.type ) ) {
-				game.over(0);
+			if ( prior_who.canKill( who.type ) ) {
+				prior_who.kill( who );
 				return false;
-				prior_moved = true;
-			} else {
-				console.log( 'no move');
+			}// end if
+			else if ( prior_who.canDie( who.type ) && who.canKill( prior_who.type ) ) {
+				game.position( who, new_x, new_y );
+				who.kill( prior_who );
+				return false;
+			}// end else if
+			else if ( prior_who.canMove( who.type ) ) {
+				prior_moved = game.move( prior_who, direction );
+			}// end if
+			else {
 				prior_moved = false;
 			}// end else
 		}// end if
@@ -130,13 +136,6 @@ var game = {};
 			who.moved = false;
 		}// end else
 
-		amplify.publish('game-move', {
-			d: direction,
-			x: new_x,
-			y: new_y,
-			t: who.type
-		});
-
 		if ( 'over' === game.state ) {
 			return false;
 		}// end if
@@ -144,14 +143,15 @@ var game = {};
 		return who.moved;
 	};
 
-	game.over = function( win ) {
+	game.over = function( win, loser ) {
 		game.enemy.stop();
+
 		var message = '';
 		if ( win === true ) {
-			$( game.position( game.enemy ) ).html( game.win_character );
+			$( game.getPosition( loser ) ).html( game.win_character );
 			message = 'U Win!!!!!';
 		} else {
-			$( game.position( game.player ) ).html( game.dead_character[ win ] );
+			$( game.getPosition( game.the_player ) ).html( game.dead_character[ win ] );
 			message = 'ZOMG u died';
 		}// end else
 
@@ -159,9 +159,33 @@ var game = {};
 
 		game.state = 'over';
 	};
+
+	$(function() {
+		game.init();
+	});
+
 })(jQuery);
 
+/* define generic object that all other game objects will be built from */
 
-$(function() {
-	game.init();
-});
+function gameObject() {
+	this.type = 'generic';
+	this.character = '&nbsp;';
+};
+
+gameObject.prototype.canMove = function( type ) {
+	return false;
+};
+
+gameObject.prototype.canKill = function( type ) {
+	return false;
+};
+
+gameObject.prototype.canDie = function( type ) {
+	return false;
+};
+
+// must be defined if canKill returns true
+gameObject.prototype.kill = function( who ) {
+	return false;
+};
