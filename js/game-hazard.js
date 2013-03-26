@@ -52,8 +52,8 @@ game.hazard = {};
 	game.hazard.init = function() {
 		game.hazard.lightning_charater = '&#9756;';
 
-		game.hazard.add( 2, 5 );
-		game.hazard.add( 8, 2 );
+		game.hazard.add( 1, 5 );
+		game.hazard.add( 3, 1 );
 	};
 
 	game.hazard.add = function( x, y ) {

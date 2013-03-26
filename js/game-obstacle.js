@@ -25,13 +25,19 @@ game.obstacle = {};
 
 	game.obstacle.init = function() {
 		game.obstacle.add( 3, 3 );
-		game.obstacle.add( 3, 8 );
+		game.obstacle.add( 3, 5 );
 		game.obstacle.add( 5, 3 );
 
-		game.obstacle.add( 7, 7 );
-		game.obstacle.add( 6, 5 );
-		game.obstacle.add( 5, 6 );
+
 		game.obstacle.add( 5, 5 );
+		game.obstacle.add( 4, 5 );
+		game.obstacle.add( 4, 3 );
+
+		game.obstacle.add( 9, 7 );
+		game.obstacle.add( 8, 7 );
+		game.obstacle.add( 7, 7 );
+		game.obstacle.add( 7, 8 );
+		game.obstacle.add( 7, 9 )
 	};
 
 	game.obstacle.add = function( x, y ) {

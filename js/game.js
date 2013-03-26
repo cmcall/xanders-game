@@ -1,11 +1,14 @@
 var game = {};
 
+// @TODO: make blocks pullable while holding spacebar
+// @TODO: 1 storm cloud moves
+
 ( function( $ ) {
 	"use strict";
 
 	game.directions = ['up', 'down', 'left', 'right'];
 	game.dead_character = ['&#10014;', '&#9832;'];
-	game.win_character = '&#9786;';
+	game.win_character = '&otimes;';
 
 	game.grid_size = 9;
 
