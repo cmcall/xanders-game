@@ -10,14 +10,33 @@ game.hazard = {};
 		this.character = '&#9729;';
 	};
 
-	gameHazard.prototype.canKill = function( type ) {
-		switch ( type ) {
+	gameHazard.prototype.canKill = function( who ) {
+		switch ( who.type ) {
 			case 'player':
 				return true;
 			break;
 			default:
 				return false;
 		}// end switch
+	};
+
+	gameHazard.prototype.canMove = function( who, direction ) {
+		if ( 'obstacle' == who.type ) {
+			game.hazard.lightning_position = game.getPosition( who );
+
+			game.move( who, game.reverse_direction( direction ) );
+			console.log('zap');
+			$( game.hazard.lightning_position ).html( game.hazard.lightning_charater );
+
+			// after a bit, clear the lightning bolt
+			setTimeout( function(){
+				if ( ! game.occupied[ game.hazard.lightning_position ] ) {
+					$( game.hazard.lightning_position ).html('');
+				}// end if
+			}, 500)
+		}// end if
+
+		return false;
 	};
 
 	gameHazard.prototype.kill = function( who ) {
@@ -31,6 +50,8 @@ game.hazard = {};
 	game.hazard.hazards = [];
 
 	game.hazard.init = function() {
+		game.hazard.lightning_charater = '&#9756;';
+
 		game.hazard.add( 2, 5 );
 		game.hazard.add( 8, 2 );
 	};

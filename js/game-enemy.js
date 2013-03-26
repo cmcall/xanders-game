@@ -10,8 +10,8 @@ game.enemy = {};
 		this.character = '&#9763;';
 	};
 
-	gameEnemy.prototype.canKill = function( type ) {
-		switch ( type ) {
+	gameEnemy.prototype.canKill = function( who ) {
+		switch ( who.type ) {
 			case 'player':
 				return true;
 			break;

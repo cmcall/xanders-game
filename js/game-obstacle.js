@@ -10,8 +10,8 @@ game.obstacle = {};
 		this.character = '&#9776;';
 	};
 
-	gameObstacle.prototype.canMove = function( type ) {
-		switch ( type ) {
+	gameObstacle.prototype.canMove = function( who ) {
+		switch ( who.type ) {
 			case 'player':
 			case 'obstacle':
 				return true;

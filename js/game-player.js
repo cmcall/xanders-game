@@ -12,8 +12,8 @@ game.player = {};
 		this.character = '&#9731;';
 	};
 
-	gamePlayer.prototype.canDie = function( type ) {
-		switch ( type ) {
+	gamePlayer.prototype.canDie = function( who ) {
+		switch ( who.type ) {
 			case 'enemy':
 			case 'hazard':
 				return true;
@@ -22,6 +22,17 @@ game.player = {};
 				return false;
 		}// end switch
 	};
+
+	gamePlayer.prototype.canMove = function( who ) {
+		switch ( who.type ) {
+			case 'obstacle':
+				return true;
+			break;
+			default:
+				return false;
+		}// end switch
+	};
+
 
 	game.player.init = function() {
 		game.the_player = new gamePlayer();

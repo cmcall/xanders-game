@@ -112,16 +112,16 @@ var game = {};
 		prior_who = game.getObjectByPosition( new_x, new_y );
 
 		if ( undefined !== prior_who && null !== prior_who) {
-			if ( prior_who.canKill( who.type ) ) {
+			if ( prior_who.canKill( who ) ) {
 				prior_who.kill( who );
 				return false;
 			}// end if
-			else if ( prior_who.canDie( who.type ) && who.canKill( prior_who.type ) ) {
+			else if ( prior_who.canDie( who ) && who.canKill( prior_who ) ) {
 				game.position( who, new_x, new_y );
 				who.kill( prior_who );
 				return false;
 			}// end else if
-			else if ( prior_who.canMove( who.type ) ) {
+			else if ( prior_who.canMove( who, direction ) ) {
 				prior_moved = game.move( prior_who, direction );
 			}// end if
 			else {
@@ -160,6 +160,23 @@ var game = {};
 		game.state = 'over';
 	};
 
+	game.reverse_direction = function ( direction ) {
+		switch ( direction ) {
+			case 'up':
+				return 'down';
+			break;
+			case 'down':
+				return 'up';
+			break;
+			case 'left':
+				return 'right';
+			break;
+			case 'right':
+				return 'left';
+			break;
+		}// end switch
+	};
+
 	$(function() {
 		game.init();
 	});
@@ -173,15 +190,15 @@ function gameObject() {
 	this.character = '&nbsp;';
 };
 
-gameObject.prototype.canMove = function( type ) {
+gameObject.prototype.canMove = function( who, direction ) {
 	return false;
 };
 
-gameObject.prototype.canKill = function( type ) {
+gameObject.prototype.canKill = function( who ) {
 	return false;
 };
 
-gameObject.prototype.canDie = function( type ) {
+gameObject.prototype.canDie = function( who ) {
 	return false;
 };
 
