@@ -7,7 +7,6 @@ game.enemy = {};
 	gameEnemy.prototype.constructor = gameEnemy;
 	function gameEnemy() {
 		this.type = 'enemy';
-		this.character = '&#9763;';
 	};
 
 	gameEnemy.prototype.canKill = function( who ) {

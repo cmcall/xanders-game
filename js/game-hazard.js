@@ -7,7 +7,6 @@ game.hazard = {};
 	gameHazard.prototype.constructor = gameHazard;
 	function gameHazard() {
 		this.type = 'hazard';
-		this.character = '&#9729;';
 	};
 
 	gameHazard.prototype.canKill = function( who ) {
@@ -24,14 +23,15 @@ game.hazard = {};
 		if ( 'obstacle' == who.type ) {
 			game.hazard.lightning_position = game.getPosition( who );
 
-			game.move( who, game.reverse_direction( direction ) );
-			console.log('zap');
-			$( game.hazard.lightning_position ).html( game.hazard.lightning_charater );
+			game.hazard.push_direction = game.reverse_direction( direction );
+			game.move( who, game.hazard.push_direction );
+
+			$( game.hazard.lightning_position ).addClass( 'lightning-' + game.hazard.push_direction );
 
 			// after a bit, clear the lightning bolt
 			setTimeout( function(){
 				if ( ! game.occupied[ game.hazard.lightning_position ] ) {
-					$( game.hazard.lightning_position ).html('');
+					$( game.hazard.lightning_position ).removeClass( 'lightning-' + game.hazard.push_direction );
 				}// end if
 			}, 500)
 		}// end if
@@ -50,7 +50,7 @@ game.hazard = {};
 	game.hazard.hazards = [];
 
 	game.hazard.init = function() {
-		game.hazard.lightning_charater = '&#9756;';
+		game.hazard.lightning_charater = '';
 
 		game.hazard.add( 1, 5 );
 		game.hazard.add( 3, 1 );

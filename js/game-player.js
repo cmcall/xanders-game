@@ -9,7 +9,6 @@ game.player = {};
 	gamePlayer.prototype.constructor = gamePlayer;
 	function gamePlayer() {
 		this.type = 'player';
-		this.character = '&#9731;';
 	};
 
 	gamePlayer.prototype.canDie = function( who ) {

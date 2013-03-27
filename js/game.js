@@ -2,13 +2,13 @@ var game = {};
 
 // @TODO: make blocks pullable while holding spacebar
 // @TODO: 1 storm cloud moves
+// @TODO: level loader
+// @TODO: level builder
 
 ( function( $ ) {
 	"use strict";
 
 	game.directions = ['up', 'down', 'left', 'right'];
-	game.dead_character = ['&#10014;', '&#9832;'];
-	game.win_character = '&otimes;';
 
 	game.grid_size = 9;
 
@@ -60,11 +60,11 @@ var game = {};
 
 		var new_position = game.getSelector( who.x, who.y );
 
-		$( new_position ).html( who.character );
+		$( new_position ).addClass( who.type );
 		game.occupied[ new_position ] = who;
 
 		if ( game.occupied[ prior_position ] === who ) {
-			$( prior_position ).html('');
+			$( prior_position ).removeClass( who.type );
 			game.occupied[ prior_position ] = null;
 		}// end if
 
@@ -146,15 +146,15 @@ var game = {};
 		return who.moved;
 	};
 
-	game.over = function( win, loser ) {
+	game.over = function( win, enemy ) {
 		game.enemy.stop();
 
 		var message = '';
 		if ( win === true ) {
-			$( game.getPosition( loser ) ).html( game.win_character );
+			$( game.getPosition( enemy ) ).attr( 'class', 'cell win' );
 			message = 'U Win!!!!!';
 		} else {
-			$( game.getPosition( game.the_player ) ).html( game.dead_character[ win ] );
+			$( game.getPosition( game.the_player ) ).attr( 'class', 'cell loss-' + win );
 			message = 'ZOMG u died';
 		}// end else
 

@@ -7,7 +7,6 @@ game.obstacle = {};
 	gameObstacle.prototype.constructor = gameObstacle;
 	function gameObstacle() {
 		this.type = 'obstacle';
-		this.character = '&#9776;';
 	};
 
 	gameObstacle.prototype.canMove = function( who ) {

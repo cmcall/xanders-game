@@ -1,12 +1,19 @@
 .cell {
 	float: left;
+
 	height: 50px;
 	width: 50px;
-	line-height: 50px;
-	background-color: white;
-	border: 1px solid black;
-	padding: 1px;
+
+	border: 1px solid #ccc;
+	padding: 0;
 	margin: 0;
+
+	background-size: 100%;
+	background-position-y: 100%;
+	background-position-x: center;
+	background-repeat: no-repeat;
+
+	line-height: 50px;
 	font-size: 2em;
 	text-align: center;
 }
@@ -19,7 +26,68 @@
 	float: left;
 }
 
+
 #state {
 	float: left;
 	padding: 10px;
+}
+
+
+.cell.enemy{
+/*	background-image: url('PlanetCute/Enemy%20Bug.png'); */
+}
+.cell.enemy:after{
+	content: '☣';
+}
+
+.cell.player{
+/*
+	background-image: url('PlanetCute/Character%20Boy.png');
+	background-size: 90%;
+*/
+}
+.cell.player:after{
+	content: '☃';
+}
+
+.cell.hazard{
+/*	background-image: url('PlanetCute/Water%20Block.png');*/
+}
+.cell.hazard:after{
+	content: '☁';
+}
+
+.cell.obstacle{
+/*	background-image: url('PlanetCute/Wood%20Block.png');*/
+}
+.cell.obstacle:after{
+	content: '☰';
+}
+
+.cell.win:after{
+	content: '⊗';
+}
+
+.cell.loss-0:after{
+	content: '✞';
+}
+
+.cell.loss-1:after{
+	content: '♨';
+}
+
+.cell.lightning-left:after{
+	content: '☜';
+}
+
+.cell.lightning-right:after{
+	content: '☞';
+}
+
+.cell.lightning-up:after{
+	content: '☝';
+}
+
+.cell.lightning-down:after{
+	content: '☟';
 }
